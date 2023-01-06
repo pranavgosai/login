@@ -14,3 +14,22 @@ export const addUser =  async (req,res) => {
 
     }
 }
+
+export const getUsers = async (req,res)=>{
+    try{
+     const users = await User.find({});
+     res.status(200).json(users);
+    }catch(error){
+        res.status(404).json({message:error.message});
+    }
+}
+
+export const getUser = async(req,res) => {
+    
+    try{
+        const users = await User.find({_id: req.params.id});
+        res.status(200).json(User);
+       }catch(error){
+           res.status(404).json({message:error.message});
+       }
+}
