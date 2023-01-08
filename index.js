@@ -1,23 +1,51 @@
-import express from 'express';
-import dotenv from 'dotenv';
-import cors from "cors";
-import bodyParser from 'body-parser';
-
-import connection from './database/db.js';
-import Routes from './routes/route.js';
-
-const app = express();
-dotenv.config();
-app.use(bodyParser.json({extended:true}));
-app.use(bodyParser.urlencoded({extended:true}));
-app.use(cors());
-app.use('/',Routes);
+const express = require('express');
+const cors = require('cors');
+const bodyparser = require('body-parser');
+const mongoose = require('mongoose');
 
 
 
-const PORT = 8000;
-const usrname = process.envDB_USERNAME;
-const password = process.envDB_PASSWORD;
-connection(usrname,password);
+main().catch(err => console.log(err));
 
-app.listen(PORT,()=>console.log(`server is running on PORT ${PORT}`));
+async function main() {
+  await mongoose.connect('mongodb://127.0.0.1:27017/demoo');
+  console.log('db connected');
+  
+}
+
+const userSchema = new mongoose.Schema({
+    username: String,
+    password: String,
+  });
+  const User = mongoose.model('User', userSchema);
+
+
+
+const server = express();
+
+
+server.use(cors());
+server.use(bodyparser.json());
+
+//CRUD - Create 
+
+server.post('/demo', async (req,res)=>{
+    let user = new User();
+    user.username = req.body.username
+    user.password = req.body.password
+    const doc =  await user.save();
+
+    console.log(doc);
+     res.json(doc);
+})
+
+
+server.get('/demo', async (req,res)=>{
+ const docs   =   await User.find({})
+ res.json(docs)
+})
+
+
+server.listen(8080,()=>{
+    console.log('server started');
+})
